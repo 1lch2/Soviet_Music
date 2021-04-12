@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+
+    <Button
+        android:id="@+id/button_play"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@android:drawable/ic_media_play"
+        android:backgroundTint="#000000" />
+
+    <Button
+        android:id="@+id/button_previous"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignBaseline="@id/button_play"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@id/button_play"
+        android:background="@android:drawable/ic_media_previous"
+        android:backgroundTint="#000000" />
+
+    <Button
+        android:id="@+id/button_next"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignBaseline="@id/button_play"
+        android:layout_toRightOf="@id/button_play"
+        android:background="@android:drawable/ic_media_next"
+        android:backgroundTint="#000000" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/music_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button_play"
+        android:layout_marginBottom="12dp"
+        android:background="#8FC4E3DA" />
+
+    <ImageView
+        android:id="@+id/album_cover_small"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/music_list"
+        android:src="@drawable/image" />
+</RelativeLayout>
