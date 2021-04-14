@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/button_play"
         android:layout_marginBottom="10dp"
-        android:background="#8FC4E3DA" />
+        android:background="#8FFFF6C7" />
 
     <ImageView
         android:id="@+id/album_cover_small"
@@ -51,4 +51,13 @@
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="5dp"
         android:src="@drawable/image" />
+
+    <Button
+        android:id="@+id/button_stop"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/stop"
+        android:layout_alignTop="@id/button_next"
+        android:layout_toRightOf="@id/button_next"
+        android:layout_marginLeft="10dp" />
 </RelativeLayout>

@@ -14,7 +14,6 @@ public class Music {
 
     private String title;
     private String path;
-    private Bitmap cover;
 
     public String getTitle () {
         return title;
@@ -32,20 +31,11 @@ public class Music {
         this.path = path;
     }
 
-    public Bitmap getCover () {
-        return cover;
-    }
-
-    public void setCover (Bitmap cover) {
-        this.cover = cover;
-    }
-
     @Override
     public String toString () {
         return "Music{" +
                 "title='" + title + '\'' +
                 ", path='" + path + '\'' +
-                ", cover=" + cover +
                 '}';
     }
 }

@@ -2,8 +2,8 @@ package com.example.simplemusic;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -14,8 +14,9 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
 
     private static final String TAG = "MusicPlayerService";
     private boolean isPlaying = false;
-    private MediaPlayer mMediaPlayer = new MediaPlayer();
 
+    private AssetFileDescriptor mDescriptor;
+    private MediaPlayer mMediaPlayer = new MediaPlayer();
     private MusicPlayerBinder binder = new MusicPlayerBinder(this);
 
     public class MusicPlayerBinder extends Binder {
@@ -40,8 +41,10 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
 
         // 初始化MediaPlayer
         try {
+            mDescriptor = getAssets().openFd("le_internationale.mp3");
+
             mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(this, Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.sample));
+            mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
@@ -52,8 +55,8 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onPrepared (MediaPlayer mp) {
         Log.d(TAG, "onPrepared: Playing");
-//        mp.start();
-//        isPlaying = true;
+        mp.setLooping(true);
+        mp.seekTo(0);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public boolean onUnbind (Intent intent) {
         Log.d(TAG, "onUnbind: service unbind");
+        mMediaPlayer.release();
         return super.onUnbind(intent);
     }
 
@@ -81,22 +85,52 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         Log.d(TAG, "onDestroy: service destroyed.");
     }
 
+    // 点击播放按钮
     public void playerStart() {
         mMediaPlayer.start();
         isPlaying = true;
         Log.d(TAG, "playerStart: start playing!");
     }
 
+    // 点击暂停按钮
     public void playerPause() {
         mMediaPlayer.pause();
         isPlaying = false;
         Log.d(TAG, "playerPause: music paused!");
     }
 
+    // 点击停止按钮
+    public void playerStop() throws IOException {
+        mMediaPlayer.reset();
+        mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
+        mMediaPlayer.prepareAsync();
+        isPlaying = false;
+    }
+
+    // 返回当前播放状态
     public boolean playerStatus() {
         return isPlaying;
     }
 
+    // 点击歌曲开始从头播放
+    public void playerNewStart(Music music) {
+        try {
+            mDescriptor = getAssets().openFd(music.getPath());
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
+            mMediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mMediaPlayer.start();
+    }
+
+    // 销毁MediaPlayer
+    public void playerDestroy() {
+        mMediaPlayer.stop();
+        mMediaPlayer.release();
+    }
+
     // TODO: Seek bar
-    // TODO: AdapterView
+    // TODO: PlayerActivity
 }
