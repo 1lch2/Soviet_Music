@@ -72,12 +72,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
 
     /**
      * 自定义的点击事件接口
-     * 在
+     * 在Activity中重写以实现代理
      */
     public interface ItemClickInterface {
         void onItemClick (View view, Music music);
     }
 
+    /**
+     * 实现代理的方法
+     * @param itemClickInterface 在Activity中被重写的接口方法
+     */
     public void realItemClick(ItemClickInterface itemClickInterface) {
         this.mItemClickInterface = itemClickInterface;
     }

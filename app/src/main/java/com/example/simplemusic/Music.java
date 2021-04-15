@@ -4,8 +4,6 @@
 */
 package com.example.simplemusic;
 
-import android.graphics.Bitmap;
-
 /**
  * 音乐对象类
  * 字段包含音乐标题，文件路径和封面图

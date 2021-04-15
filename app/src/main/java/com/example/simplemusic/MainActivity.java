@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,6 +26,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
+    private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
     private MusicPlayerService mService;
     private List<Music> mMusicList;
 
@@ -36,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onServiceDisconnected (ComponentName name) {}
+        public void onServiceDisconnected (ComponentName name) {
+        }
     };
 
     @Override
@@ -44,8 +49,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG, "onCreate: mainActivity created");
+
         // 绑定服务
         Intent serviceIntent = new Intent(this, MusicPlayerService.class);
+        startService(serviceIntent);
         bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
 
         // 初始化所有的固定按钮的引用
@@ -75,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 mService.playerNewStart(music);
                 playButton.setBackgroundResource(R.drawable.pause);
 
-                Toast.makeText(MainActivity.this, "Now Playing: "+music.getTitle(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Now Playing: " + music.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -106,11 +114,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick (View v) {
                 playButton.setBackgroundResource(R.drawable.play);
-                try {
-                    mService.playerStop();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mService.playerStop();
             }
         });
 
@@ -118,16 +122,11 @@ public class MainActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                int currentIndex = mService.playerIndex();
-                Music temp;
-                if (currentIndex == 0) {
-                    temp = mMusicList.get(mMusicList.size()-1);
-                } else {
-                    currentIndex--;
-                    temp = mMusicList.get(currentIndex);
-                }
-                mService.playerNewStart(temp);
-                Toast.makeText(MainActivity.this, "Now Playing: "+temp.getTitle(), Toast.LENGTH_LONG).show();
+                mPlayerSingleton.playerPrevious(MainActivity.this);
+                playButton.setBackgroundResource(R.drawable.pause);
+                Toast.makeText(MainActivity.this,
+                               "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
+                               Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -135,29 +134,48 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                int currentIndex = mService.playerIndex();
-                Music temp;
-                if (currentIndex == mMusicList.size()-1) {
-                    temp = mMusicList.get(0);
-                } else {
-                    currentIndex++;
-                    temp = mMusicList.get(currentIndex);
-                }
-                mService.playerNewStart(temp);
-                Toast.makeText(MainActivity.this, "Now Playing: "+temp.getTitle(), Toast.LENGTH_LONG).show();
+                mPlayerSingleton.playerNext(MainActivity.this);
+
+                playButton.setBackgroundResource(R.drawable.pause);
+                Toast.makeText(MainActivity.this,
+                               "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
+                               Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
+    protected void onStart () {
+        super.onStart();
+
+        bindService(new Intent(this, MusicPlayerService.class), mConnection, 0);
+        Log.d(TAG, "onStart: mainActivity started");
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+        Log.d(TAG, "onPause: mainActivity paused");
+    }
+
+    @Override
+    protected void onStop () {
+        super.onStop();
+        Log.d(TAG, "onStop: mainActivity stopped!");
+    }
+
+    @Override
     protected void onDestroy () {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: main activity destroyed");
+
         unbindService(mConnection);
-        // TODO: 直接杀死应用时，Service不会销毁
+        stopService(new Intent(this, MusicPlayerService.class));
     }
 
     /**
      * 打开播放器界面
+     *
      * @param view 被点击的View，即小封面图
      */
     private void openMainPlayer (View view) {
@@ -167,22 +185,24 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 初始化音乐列表
+     *
      * @throws IOException IOException
      */
-    private void initMusic() throws IOException {
+    private void initMusic () throws IOException {
         AssetManager mAssetManager = getAssets();
         mMusicList = new ArrayList<>();
 
         int index = 0; // 音乐资源的序号
-        for (String filePath : mAssetManager.list("")){
+        for (String filePath : mAssetManager.list("")) {
             if (filePath.endsWith(".mp3")) {
                 Music tempMusic = new Music();
                 tempMusic.setPath(filePath);
-                tempMusic.setTitle(filePath.substring(0, filePath.length()-4));
+                tempMusic.setTitle(filePath.substring(0, filePath.length() - 4));
                 tempMusic.setIndex(index++);
 
                 mMusicList.add(tempMusic);
             }
         }
+        mPlayerSingleton.setMusicList(mMusicList);
     }
 }

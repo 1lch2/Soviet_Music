@@ -1,40 +1,23 @@
 package com.example.simplemusic;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
-
-import java.io.IOException;
-
-public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener{
+/**
+ * @author lichenghao02
+ * @since 2021/04/14
+ */
+public class MusicPlayerService extends Service {
 
     private static final String TAG = "MusicPlayerService";
-    private boolean isPlaying = false;
-    private String currentPlaying = "le_internationale";
-    private int currentIndex = 2;
-    private static final int notificationId = 616;
 
-    private AssetFileDescriptor mDescriptor;
-    private MediaPlayer mMediaPlayer = new MediaPlayer();
+    private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
+    private Context mContext = null;
     private MusicPlayerBinder binder = new MusicPlayerBinder(this);
-    private NotificationCompat.Builder mBuilder = null;
-    private NotificationManager mManager = null;
-    private Notification mNotification = null;
-    private Bitmap largeIcon = null;
 
     public class MusicPlayerBinder extends Binder {
         private Service currentService;
@@ -56,28 +39,8 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         Log.d(TAG, "onCreate: service created");
         super.onCreate();
 
-        // 初始化MediaPlayer
-        try {
-            mDescriptor = getAssets().openFd("le_internationale.mp3"); // 默认歌曲为国际歌
-
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
-            mMediaPlayer.setOnPreparedListener(this);
-            mMediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            showNotification();
-        }
-    }
-
-    @Override
-    public void onPrepared (MediaPlayer mp) {
-        Log.d(TAG, "onPrepared: Playing");
-        mp.setLooping(true);
-        mp.seekTo(0);
+        mContext = getApplicationContext();
+        mPlayerSingleton.onCreate(mContext, this);
     }
 
     @Override
@@ -89,13 +52,13 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public IBinder onBind (Intent intent) {
         Log.d(TAG, "onBind: service bound to activity");
+
         return binder;
     }
 
     @Override
     public boolean onUnbind (Intent intent) {
         Log.d(TAG, "onUnbind: service unbind");
-        mMediaPlayer.release();
         return super.onUnbind(intent);
     }
 
@@ -108,38 +71,10 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     }
 
     /**
-     * 应用启动时显示前台常驻通知
-     * 通知显示当前播放歌曲
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void showNotification() {
-        largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.play);
-
-        // Android 8 以上必须有Notification Channel
-        NotificationChannel channel = new NotificationChannel("music", "player", NotificationManager.IMPORTANCE_LOW);
-        mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mManager.createNotificationChannel(channel);
-
-        mBuilder = new NotificationCompat.Builder(this, "music");
-        mBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setLargeIcon(largeIcon)
-                .setContentTitle("Soviet Music player")
-                .setContentText("Now playing: " + currentPlaying)
-                .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        mNotification = mBuilder.build();
-        mManager.notify(notificationId, mNotification);
-
-        startForeground(notificationId, mNotification);
-    }
-
-    /**
      * 点击播放按钮
      */
     public void playerStart() {
-        mMediaPlayer.start();
-        isPlaying = true;
+        mPlayerSingleton.playerStart();
         Log.d(TAG, "playerStart: start playing!");
     }
 
@@ -147,20 +82,15 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      * 点击暂停按钮
      */
     public void playerPause() {
-        mMediaPlayer.pause();
-        isPlaying = false;
+        mPlayerSingleton.playerPause();
         Log.d(TAG, "playerPause: music paused!");
     }
 
     /**
      * 点击停止按钮
-     * @throws IOException IOException
      */
-    public void playerStop() throws IOException {
-        mMediaPlayer.reset();
-        mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
-        mMediaPlayer.prepareAsync();
-        isPlaying = false;
+    public void playerStop() {
+        mPlayerSingleton.playerStop();
     }
 
     /**
@@ -168,7 +98,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      * @return 是否在播放音乐
      */
     public boolean playerStatus() {
-        return isPlaying;
+        return mPlayerSingleton.playerStatus();
     }
 
     /**
@@ -176,7 +106,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      * @return 当前音乐的下标
      */
     public int playerIndex() {
-        return currentIndex;
+        return mPlayerSingleton.playerIndex();
     }
 
     /**
@@ -184,40 +114,13 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      * @param music 准备播放的新歌曲对象
      */
     public void playerNewStart(Music music) {
-        try {
-            mDescriptor = getAssets().openFd(music.getPath());
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
-            mMediaPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mMediaPlayer.start();
-
-        // 设置状态
-        isPlaying = true;
-        currentPlaying = music.getTitle();
-        currentIndex = music.getIndex();
-
-        // 重新发布常驻通知，更新内容
-        mBuilder = new NotificationCompat.Builder(this, "music");
-        mBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setLargeIcon(largeIcon)
-                .setContentTitle("Soviet Music player")
-                .setContentText("Now playing: " + currentPlaying)
-                .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        mNotification = mBuilder.build();
-        mManager.notify(notificationId, mNotification);
+        mPlayerSingleton.playerNewStart(music, mContext);
     }
 
-    // 销毁MediaPlayer
+    /**
+     * 销毁MediaPlayer对象
+     */
     public void playerDestroy() {
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
+        mPlayerSingleton.playerDestroy();
     }
-
-    // TODO: Seek bar
-    // TODO: PlayerActivity
 }
