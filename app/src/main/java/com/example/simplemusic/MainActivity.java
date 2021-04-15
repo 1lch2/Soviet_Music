@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 初始化音乐列表
-     * @throws IOException
+     * @throws IOException IOException
      */
     private void initMusic() throws IOException {
         AssetManager mAssetManager = getAssets();

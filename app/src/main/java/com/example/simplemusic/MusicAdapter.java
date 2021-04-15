@@ -32,10 +32,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             musicTitle = (TextView) view.findViewById(R.id.music_title);
             musicView = view;
         }
-
-        public TextView getMusicTitle () {
-            return musicTitle;
-        }
     }
 
     public MusicAdapter (List<Music> musicList) {
@@ -79,7 +75,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
      * 在
      */
     public interface ItemClickInterface {
-        public void onItemClick(View view, Music music);
+        void onItemClick (View view, Music music);
     }
 
     public void realItemClick(ItemClickInterface itemClickInterface) {
