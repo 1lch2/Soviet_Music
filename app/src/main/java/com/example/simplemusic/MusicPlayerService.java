@@ -25,6 +25,7 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     private static final String TAG = "MusicPlayerService";
     private boolean isPlaying = false;
     private String currentPlaying = "le_internationale";
+    private int currentIndex = 2;
     private static final int notificationId = 616;
 
     private AssetFileDescriptor mDescriptor;
@@ -133,21 +134,28 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         startForeground(notificationId, mNotification);
     }
 
-    // 点击播放按钮
+    /**
+     * 点击播放按钮
+     */
     public void playerStart() {
         mMediaPlayer.start();
         isPlaying = true;
         Log.d(TAG, "playerStart: start playing!");
     }
 
-    // 点击暂停按钮
+    /**
+     * 点击暂停按钮
+     */
     public void playerPause() {
         mMediaPlayer.pause();
         isPlaying = false;
         Log.d(TAG, "playerPause: music paused!");
     }
 
-    // 点击停止按钮
+    /**
+     * 点击停止按钮
+     * @throws IOException IOException
+     */
     public void playerStop() throws IOException {
         mMediaPlayer.reset();
         mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor.getLength());
@@ -155,12 +163,26 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         isPlaying = false;
     }
 
-    // 返回当前播放状态
+    /**
+     * 返回当前播放器的播放状态
+     * @return 是否在播放音乐
+     */
     public boolean playerStatus() {
         return isPlaying;
     }
 
-    // 点击歌曲开始从头播放
+    /**
+     * 返回当前正在播放的歌曲的下标
+     * @return 当前音乐的下标
+     */
+    public int playerIndex() {
+        return currentIndex;
+    }
+
+    /**
+     * 开始播放新歌曲
+     * @param music 准备播放的新歌曲对象
+     */
     public void playerNewStart(Music music) {
         try {
             mDescriptor = getAssets().openFd(music.getPath());
@@ -172,10 +194,12 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         }
         mMediaPlayer.start();
 
-        // 设置相关状态以及通知信息
+        // 设置状态
         isPlaying = true;
         currentPlaying = music.getTitle();
+        currentIndex = music.getIndex();
 
+        // 重新发布常驻通知，更新内容
         mBuilder = new NotificationCompat.Builder(this, "music");
         mBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setLargeIcon(largeIcon)

@@ -14,6 +14,7 @@ public class Music {
 
     private String title;
     private String path;
+    private int index;
 
     public String getTitle () {
         return title;
@@ -29,6 +30,14 @@ public class Music {
 
     public void setPath (String path) {
         this.path = path;
+    }
+
+    public int getIndex () {
+        return index;
+    }
+
+    public void setIndex (int index) {
+        this.index = index;
     }
 
     @Override

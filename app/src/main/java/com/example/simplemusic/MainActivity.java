@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 mService.playerNewStart(music);
                 playButton.setBackgroundResource(R.drawable.pause);
 
-                // Toast 提示当前播放
                 Toast.makeText(MainActivity.this, "Now Playing: "+music.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
@@ -119,7 +118,16 @@ public class MainActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                // TODO: previous
+                int currentIndex = mService.playerIndex();
+                Music temp;
+                if (currentIndex == 0) {
+                    temp = mMusicList.get(mMusicList.size()-1);
+                } else {
+                    currentIndex--;
+                    temp = mMusicList.get(currentIndex);
+                }
+                mService.playerNewStart(temp);
+                Toast.makeText(MainActivity.this, "Now Playing: "+temp.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -127,7 +135,16 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                // TODO: next
+                int currentIndex = mService.playerIndex();
+                Music temp;
+                if (currentIndex == mMusicList.size()-1) {
+                    temp = mMusicList.get(0);
+                } else {
+                    currentIndex++;
+                    temp = mMusicList.get(currentIndex);
+                }
+                mService.playerNewStart(temp);
+                Toast.makeText(MainActivity.this, "Now Playing: "+temp.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -136,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy () {
         super.onDestroy();
         unbindService(mConnection);
-
         // TODO: 直接杀死应用时，Service不会销毁
     }
 
@@ -157,11 +173,13 @@ public class MainActivity extends AppCompatActivity {
         AssetManager mAssetManager = getAssets();
         mMusicList = new ArrayList<>();
 
+        int index = 0; // 音乐资源的序号
         for (String filePath : mAssetManager.list("")){
             if (filePath.endsWith(".mp3")) {
                 Music tempMusic = new Music();
                 tempMusic.setPath(filePath);
                 tempMusic.setTitle(filePath.substring(0, filePath.length()-4));
+                tempMusic.setIndex(index++);
 
                 mMusicList.add(tempMusic);
             }
