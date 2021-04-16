@@ -24,12 +24,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     private List<Music> mMusicList;
 
     /** 自定义的RecyclerView项目点击接口 */
-    private ItemClickInterface mItemClickInterface;
+    private OnItemClickListener mOnItemClickListener;
 
     /**
      * 用于持有View对象的ViewHolder类
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         /** 列表项中ImageView组件 */
         ImageView musicCover;
@@ -73,7 +73,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
                 int position = viewHolder.getAdapterPosition();
                 Music music = mMusicList.get(position);
 
-                mItemClickInterface.onItemClick(v, music);
+                mOnItemClickListener.onItemClick(v, music);
             }
         });
 
@@ -89,14 +89,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
 
     @Override
     public int getItemCount () {
-        return mMusicList.size();
+        if (mMusicList != null) {
+            return mMusicList.size();
+        } else {
+            return 0;
+        }
     }
 
     /**
-     * 自定义的点击事件接口
+     * 自定义的点击事件监听器接口
      * 在Activity中重写以实现代理
      */
-    public interface ItemClickInterface {
+    public interface OnItemClickListener {
 
         /**
          * 点击RecyclerView的列表项时调用的方法<br>
@@ -111,9 +115,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     /**
      * 实现代理的方法
      *
-     * @param itemClickInterface 在Activity中被重写的接口方法
+     * @param onItemClickListener 在Activity中被重写的接口方法
      */
-    public void realItemClick (ItemClickInterface itemClickInterface) {
-        this.mItemClickInterface = itemClickInterface;
+    public void realItemClick (OnItemClickListener onItemClickListener) {
+        this.mOnItemClickListener = onItemClickListener;
     }
 }
