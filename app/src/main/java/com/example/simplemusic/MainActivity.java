@@ -24,14 +24,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 应用的主界面。<br>
+ * App启动后进入此界面，通过点击底部小封面图进入PlayerActivity。
+ * 应用启动后会启动并绑定MusicPlayerService，并在到达onDestroy声明周期时解绑并停止该Service。
+ * @see PlayerActivity
+ * @see MusicPlayerService
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // 日志标签
     private static final String TAG = "MainActivity";
 
+    // 音乐播放器单例对象
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
+
+    // 音乐播放器服务以及从assets目录读取的音乐列表
     private MusicPlayerService mService;
     private List<Music> mMusicList;
 
+    // 用于绑定Service的ServiceConnection对象
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected (ComponentName name, IBinder service) {
@@ -174,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 打开播放器界面
+     * 进入播放器界面
      *
      * @param view 被点击的View，即小封面图
      */
@@ -186,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 初始化音乐列表
      *
-     * @throws IOException IOException
+     * @throws IOException assets目录为空时会抛出IOException
      */
     private void initMusic () throws IOException {
         AssetManager mAssetManager = getAssets();

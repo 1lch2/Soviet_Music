@@ -15,18 +15,29 @@ import java.util.List;
  * @author lichenghao02
  * @since 2021/04/14
  */
+
+/**
+ * 填充音乐列表的Adapter类<br>
+ * 为存放音乐列表的RecyclerView提供数据，每个列表项内容来自Music对象
+ *
+ * @see Music
+ * @see MainActivity#initMusic()
+ */
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
 
     private List<Music> mMusicList;
     private ItemClickInterface mItemClickInterface;
 
+    /**
+     * 用于持有View对象的ViewHolder类
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView musicCover;
         TextView musicTitle;
         View musicView;
 
-        public ViewHolder(View view) {
+        public ViewHolder (View view) {
             super(view);
             musicCover = (ImageView) view.findViewById(R.id.music_cover);
             musicTitle = (TextView) view.findViewById(R.id.music_title);
@@ -34,6 +45,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         }
     }
 
+    // 类构造方法
     public MusicAdapter (List<Music> musicList) {
         mMusicList = musicList;
     }
@@ -75,14 +87,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
      * 在Activity中重写以实现代理
      */
     public interface ItemClickInterface {
+
         void onItemClick (View view, Music music);
     }
 
     /**
      * 实现代理的方法
+     *
      * @param itemClickInterface 在Activity中被重写的接口方法
      */
-    public void realItemClick(ItemClickInterface itemClickInterface) {
+    public void realItemClick (ItemClickInterface itemClickInterface) {
         this.mItemClickInterface = itemClickInterface;
     }
 

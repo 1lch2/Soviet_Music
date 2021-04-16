@@ -5,8 +5,8 @@
 package com.example.simplemusic;
 
 /**
- * 音乐对象类
- * 字段包含音乐标题，文件路径和封面图
+ * 音乐对象类。<br>
+ * 一个Java Bean，字段包含音乐标题，文件路径和封面图
  */
 public class Music {
 

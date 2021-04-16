@@ -11,22 +11,35 @@ import android.util.Log;
  * @author lichenghao02
  * @since 2021/04/14
  */
+
+/**
+ * 音乐播放器服务。<br>
+ * 服务持有并维护音乐播放器单例对象，通过与Activity绑定并在通知栏常驻保持运行。
+ * 服务在主界面销毁后解除绑定并停止。
+ *
+ * @see MainActivity
+ */
 public class MusicPlayerService extends Service {
 
     private static final String TAG = "MusicPlayerService";
 
+    // 维护的音乐播放器单例以及应用的上下文
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
     private Context mContext = null;
     private MusicPlayerBinder binder = new MusicPlayerBinder(this);
 
+    /**
+     * 用于绑定服务的Binder类
+     */
     public class MusicPlayerBinder extends Binder {
+
         private Service currentService;
 
-        public MusicPlayerBinder(Service service) {
+        public MusicPlayerBinder (Service service) {
             currentService = service;
         }
 
-        MusicPlayerService getService() {
+        MusicPlayerService getService () {
             return (MusicPlayerService) currentService;
         }
     }
@@ -73,7 +86,7 @@ public class MusicPlayerService extends Service {
     /**
      * 点击播放按钮
      */
-    public void playerStart() {
+    public void playerStart () {
         mPlayerSingleton.playerStart();
         Log.d(TAG, "playerStart: start playing!");
     }
@@ -81,7 +94,7 @@ public class MusicPlayerService extends Service {
     /**
      * 点击暂停按钮
      */
-    public void playerPause() {
+    public void playerPause () {
         mPlayerSingleton.playerPause();
         Log.d(TAG, "playerPause: music paused!");
     }
@@ -89,38 +102,41 @@ public class MusicPlayerService extends Service {
     /**
      * 点击停止按钮
      */
-    public void playerStop() {
+    public void playerStop () {
         mPlayerSingleton.playerStop();
     }
 
     /**
      * 返回当前播放器的播放状态
+     *
      * @return 是否在播放音乐
      */
-    public boolean playerStatus() {
+    public boolean playerStatus () {
         return mPlayerSingleton.playerStatus();
     }
 
     /**
      * 返回当前正在播放的歌曲的下标
+     *
      * @return 当前音乐的下标
      */
-    public int playerIndex() {
+    public int playerIndex () {
         return mPlayerSingleton.playerIndex();
     }
 
     /**
      * 开始播放新歌曲
+     *
      * @param music 准备播放的新歌曲对象
      */
-    public void playerNewStart(Music music) {
+    public void playerNewStart (Music music) {
         mPlayerSingleton.playerNewStart(music, mContext);
     }
 
     /**
      * 销毁MediaPlayer对象
      */
-    public void playerDestroy() {
+    public void playerDestroy () {
         mPlayerSingleton.playerDestroy();
     }
 }

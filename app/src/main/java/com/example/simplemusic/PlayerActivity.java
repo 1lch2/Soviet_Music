@@ -14,10 +14,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * 音乐播放器界面。<br>
+ * 由主界面点击小封面图进入，点击系统返回按钮可以返回到主界面。
+ */
 public class PlayerActivity extends AppCompatActivity {
 
+    // 日志标签
     private static final String TAG = "PlayerActivity";
 
+    // 播放器单例对象
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
 
     @Override
@@ -90,7 +96,6 @@ public class PlayerActivity extends AppCompatActivity {
 
         // 进度条
         progressSeekBar.setOnSeekBarChangeListener(new MusicProgressBar());
-
     }
 
     @Override
@@ -112,6 +117,10 @@ public class PlayerActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy: destroyed");
     }
 
+    /**
+     * 进度条监听器对象。<br>
+     * 用于维护进度条状态以及拖动进度条的操作
+     */
     public class MusicProgressBar implements SeekBar.OnSeekBarChangeListener {
 
         @Override
@@ -125,6 +134,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         @Override
         public void onStopTrackingTouch (SeekBar seekBar) {
+            // 结束拖动时将音乐进度定位到对应位置
             mPlayerSingleton.playerSetProgress(seekBar.getProgress());
         }
     }
