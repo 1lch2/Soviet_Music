@@ -1,7 +1,3 @@
-/**
- * @author lichenghao02
- * @since 2021/04/12
- */
 package com.example.simplemusic;
 
 import android.content.ComponentName;
@@ -10,7 +6,6 @@ import android.content.ServiceConnection;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,25 +20,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 应用的主界面。<br>
- * App启动后进入此界面，通过点击底部小封面图进入PlayerActivity。
+ * 应用的主界面。
+ * <p>App启动后进入此界面，通过点击底部小封面图进入PlayerActivity。
  * 应用启动后会启动并绑定MusicPlayerService，并在到达onDestroy声明周期时解绑并停止该Service。
- * @see PlayerActivity
- * @see MusicPlayerService
+ *
+ * @author lichenghao02
+ * @since 2021/04/12
  */
 public class MainActivity extends AppCompatActivity {
 
-    // 日志标签
-    private static final String TAG = "MainActivity";
-
-    // 音乐播放器单例对象
+    /** 音乐播放器单例对象 */
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
 
-    // 音乐播放器服务以及从assets目录读取的音乐列表
+    /** 音乐播放器服务 */
     private MusicPlayerService mService;
+    /** 从assets目录读取的音乐列表 */
     private List<Music> mMusicList;
 
-    // 用于绑定Service的ServiceConnection对象
+    /** 用于绑定Service的ServiceConnection对象 */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected (ComponentName name, IBinder service) {
@@ -60,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Log.d(TAG, "onCreate: mainActivity created");
 
         // 绑定服务
         Intent serviceIntent = new Intent(this, MusicPlayerService.class);
@@ -159,28 +151,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart () {
         super.onStart();
-
         bindService(new Intent(this, MusicPlayerService.class), mConnection, 0);
-        Log.d(TAG, "onStart: mainActivity started");
-    }
-
-    @Override
-    protected void onPause () {
-        super.onPause();
-        Log.d(TAG, "onPause: mainActivity paused");
-    }
-
-    @Override
-    protected void onStop () {
-        super.onStop();
-        Log.d(TAG, "onStop: mainActivity stopped!");
     }
 
     @Override
     protected void onDestroy () {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: main activity destroyed");
-
         unbindService(mConnection);
         stopService(new Intent(this, MusicPlayerService.class));
     }

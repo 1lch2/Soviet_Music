@@ -22,56 +22,80 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * @author lichenghao02
- * @since 2021/04/15
- */
-
-/**
  * 音乐播放器单例<br>
  * 用于维护负责播放音乐的MediaPlayer对象，负责通知的Notification等一类对象。
  * 类对外暴露多个公共方法，通过这些方法可以控制音乐启动停止，切换音乐，同时维护常驻的通知内容。
  * 同时维护一个为进度条计时的Timer，仅当进入PlayerActivity时启动计时任务并移动进度条。
  *
- * @see PlayerActivity
+ * @author lichenghao02
+ * @since 2021/04/15
  */
 public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
 
-    // 维护的基本类型变量，用于维护音乐播放状态以及发送通知
+    /** 音乐播放状态 */
     private boolean isPlaying = false;
+    /** 当前播放音乐的标题 */
     private String currentPlaying = "le_internationale";
+    /** 当前播放音乐的序号 */
     private int currentIndex = 2;
+    /** 通知ID */
     private static final int notificationId = 616;
 
-    // 维护的音乐列表对象，播放器对象，以及通知相关的对象
+    /** 维护的音乐列表对象 */
     private List<Music> mMusicList;
+    /** 播放器对象 */
     private MediaPlayer mMediaPlayer = new MediaPlayer();
+    /** 读取assets目录的AFD对象 */
     private AssetFileDescriptor mDescriptor;
+    /** 常驻通知的Builder对象 */
     private NotificationCompat.Builder mBuilder = null;
+    /** 常驻通知的Manager对象 */
     private NotificationManager mManager = null;
+    /** 常驻通知对象 */
     private Notification mNotification = null;
+    /** 通知使用的大图标对象 */
     private Bitmap largeIcon = null;
+    /** 进度条计时器 */
     private Timer mTimer = new Timer();
 
+    /**
+     * 持有单例的静态内部类
+     */
     private static class SingletonHolder {
 
+        /** 单例的静态实例 */
         private static final PlayerSingleton INSTANCE = new PlayerSingleton();
     }
 
+    /**
+     * 类构造方法
+     */
     private PlayerSingleton () {
     }
 
+    /**
+     * 获取单例对象
+     *
+     * @return 单例对象
+     */
     public static PlayerSingleton getInstance () {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * 返回当前播放的音乐标题
+     *
+     * @return 当前播放音乐的标题
+     */
     public String getCurrentPlaying () {
         return currentPlaying;
     }
 
-    public List<Music> getMusicList () {
-        return mMusicList;
-    }
-
+    /**
+     * 设置音乐列表
+     *
+     * @param musicList 通过assets目录添加的音乐列表
+     */
     public void setMusicList (List<Music> musicList) {
         mMusicList = musicList;
     }
@@ -172,7 +196,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
     }
 
     /**
-     * 下一首
+     * 切换下一首
      *
      * @param context 调用的Activity的上下文
      */
@@ -189,7 +213,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
     }
 
     /**
-     * 上一首
+     * 切换上一首
      *
      * @param context 调用的Activity的上下文
      */

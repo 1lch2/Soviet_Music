@@ -1,11 +1,6 @@
-/**
- * @author lichenghao02
- * @since 2021/04/12
- */
 package com.example.simplemusic;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -17,21 +12,19 @@ import androidx.appcompat.app.AppCompatActivity;
 /**
  * 音乐播放器界面。<br>
  * 由主界面点击小封面图进入，点击系统返回按钮可以返回到主界面。
+ *
+ * @author lichenghao02
+ * @date 2021/4/12
  */
 public class PlayerActivity extends AppCompatActivity {
 
-    // 日志标签
-    private static final String TAG = "PlayerActivity";
-
-    // 播放器单例对象
+    /** 播放器单例对象 */
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-
-        Log.d(TAG, "onCreate: playerActivity created");
 
         // 初始化所有的固定按钮的引用
         final TextView musicTitle = (TextView) findViewById(R.id.title_music);
@@ -99,22 +92,9 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart () {
-        super.onStart();
-        Log.d(TAG, "onStart: started!");
-    }
-
-    @Override
     protected void onStop () {
         super.onStop();
-        Log.d(TAG, "onStop: stopped!");
         mPlayerSingleton.timerStop();
-    }
-
-    @Override
-    protected void onDestroy () {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: destroyed");
     }
 
     /**
