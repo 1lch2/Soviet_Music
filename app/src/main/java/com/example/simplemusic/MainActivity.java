@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 应用的主界面。
@@ -61,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
         bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
 
         // 初始化所有的固定按钮的引用
-        ImageView smallAlbumCover = (ImageView) findViewById(R.id.album_cover_small);
-        final Button playButton = (Button) findViewById(R.id.button_play);
-        Button previousButton = (Button) findViewById(R.id.button_previous);
-        Button nextButton = (Button) findViewById(R.id.button_next);
-        Button stopButton = (Button) findViewById(R.id.button_stop);
+        ImageView smallAlbumCover = findViewById(R.id.album_cover_small);
+        final Button playButton = findViewById(R.id.button_play);
+        Button previousButton = findViewById(R.id.button_previous);
+        Button nextButton = findViewById(R.id.button_next);
+        Button stopButton = findViewById(R.id.button_stop);
 
         try {
             initMusic();
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 设置音乐列表
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.music_list);
+        RecyclerView recyclerView = findViewById(R.id.music_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         MusicAdapter musicAdapter = new MusicAdapter(mMusicList);
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         smallAlbumCover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                openMainPlayer(v);
+                openMainPlayer();
             }
         });
 
@@ -163,10 +164,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 进入播放器界面
-     *
-     * @param view 被点击的View，即小封面图
      */
-    private void openMainPlayer (View view) {
+    private void openMainPlayer () {
         Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
         startActivity(intent);
     }
@@ -181,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         mMusicList = new ArrayList<>();
 
         int index = 0; // 音乐资源的序号
-        for (String filePath : mAssetManager.list("")) {
+        for (String filePath : Objects.requireNonNull(mAssetManager.list(""))) {
             if (filePath.endsWith(".mp3")) {
                 Music tempMusic = new Music();
                 tempMusic.setPath(filePath);

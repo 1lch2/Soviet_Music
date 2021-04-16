@@ -27,11 +27,11 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
 
         // 初始化所有的固定按钮的引用
-        final TextView musicTitle = (TextView) findViewById(R.id.title_music);
-        final Button playButton = (Button) findViewById(R.id.button_play_player);
-        Button previousButton = (Button) findViewById(R.id.button_previous_player);
-        Button nextButton = (Button) findViewById(R.id.button_next_player);
-        final SeekBar progressSeekBar = (SeekBar) findViewById(R.id.progressbar);
+        final TextView musicTitle = findViewById(R.id.title_music);
+        final Button playButton = findViewById(R.id.button_play_player);
+        Button previousButton = findViewById(R.id.button_previous_player);
+        Button nextButton = findViewById(R.id.button_next_player);
+        final SeekBar progressSeekBar = findViewById(R.id.progressbar);
 
         // 按播放状态设置控件外观
         if (mPlayerSingleton.playerStatus()) {

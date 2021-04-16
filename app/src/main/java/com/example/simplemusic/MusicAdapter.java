@@ -45,8 +45,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
          */
         public ViewHolder (View view) {
             super(view);
-            musicCover = (ImageView) view.findViewById(R.id.music_cover);
-            musicTitle = (TextView) view.findViewById(R.id.music_title);
+            musicCover = view.findViewById(R.id.music_cover);
+            musicTitle = view.findViewById(R.id.music_title);
             musicView = view;
         }
     }

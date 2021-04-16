@@ -26,7 +26,7 @@ public class MusicPlayerService extends Service {
     /**
      * 用于绑定服务的Binder类
      */
-    public class MusicPlayerBinder extends Binder {
+    public static class MusicPlayerBinder extends Binder {
 
         private Service currentService;
 
