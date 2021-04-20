@@ -1,10 +1,10 @@
-# 项目名称
-本仓库为翰林学院抚新培训新人训练营用个人仓库。包含Android端练习题。
+# Soviet Music
+An exercise of Android development.
 
-部门导师：王刚（wanggang21@baidu.com）
+This is a simple music player that loads music files from project `assets` directory. I have already put some classic Soviet music into it
 
-## 项目环境
-- Java: 1.8
-- Android Studio: 4.0.1
-- Compile SDK version: 30
-- Minimum SDK level: 21
+Currently, this player can only play the music inside the project directory. The function of scanning music from the device will be added in future updates.
+
+## SDK version
+- Minimum SDK level: 21 (Android 5.0)
+- Compile SDK level: 30 (Android 10)

@@ -117,6 +117,4 @@ public class MusicPlayerService extends Service {
     public void playerDestroy () {
         mPlayerSingleton.playerDestroy();
     }
-
-    // TODO: empty object
 }

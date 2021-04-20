@@ -10,15 +10,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Build;
-import android.widget.SeekBar;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 音乐播放器单例<br>
@@ -54,8 +51,6 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
     private Notification mNotification = null;
     /** 通知使用的大图标对象 */
     private Bitmap largeIcon = null;
-    /** 进度条计时器 */
-    private Timer mTimer = new Timer();
 
     /**
      * 持有单例的静态内部类
@@ -300,34 +295,16 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
     }
 
     /**
-     * 启动进度条计时器
+     * 获取当前音乐播放进度的百分数
      *
-     * @param seekBar 进度条的SeekBar对象
+     * @return 播放进度的百分数整数
      */
-    public void timerStart (final SeekBar seekBar) {
-        if (mTimer == null) {
-            mTimer = new Timer();
-        }
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run () {
-                int currentProgress = mMediaPlayer.getCurrentPosition();
-                int totalProgress = mMediaPlayer.getDuration();
+    public int getPlayerProgress () {
+        int currentProgress = mMediaPlayer.getCurrentPosition();
+        int totalProgress = mMediaPlayer.getDuration();
 
-                seekBar.setProgress(currentProgress * 100 / totalProgress);
-            }
-        }, 0, 100);
+        return currentProgress * 100 / totalProgress;
     }
 
-    /**
-     * 清空计时器
-     */
-    public void timerStop () {
-        if (mTimer != null) {
-            mTimer.cancel();
-        }
-        mTimer = null;
-    }
-
-    // TODO: Handler
+    // TODO: empty object issues
 }

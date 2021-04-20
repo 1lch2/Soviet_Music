@@ -1,6 +1,8 @@
 package com.example.simplemusic;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -21,6 +23,12 @@ public class PlayerActivity extends AppCompatActivity {
     /** 播放器单例对象 */
     private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
 
+    /** 进度条计时器的Handler */
+    private Handler mTimerHandler;
+
+    /** 循环调整进度条的Runnable */
+    private Runnable mTimerRunnable;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,10 +41,26 @@ public class PlayerActivity extends AppCompatActivity {
         Button nextButton = findViewById(R.id.button_next_player);
         final SeekBar progressSeekBar = findViewById(R.id.progressbar);
 
+        // 创建HandlerThread在子线程中运行计时器
+        HandlerThread handlerThread = new HandlerThread("timerThread");
+        handlerThread.start();
+
+        // 每100毫秒调整一次进度条
+        mTimerRunnable = new Runnable() {
+            @Override
+            public void run () {
+                progressSeekBar.setProgress(mPlayerSingleton.getPlayerProgress());
+                mTimerHandler.postDelayed(this, 100);
+            }
+        };
+
+        mTimerHandler = new Handler(handlerThread.getLooper());
+
+
         // 按播放状态设置控件外观
         if (mPlayerSingleton.playerStatus()) {
             playButton.setBackgroundResource(R.drawable.pause);
-            mPlayerSingleton.timerStart(progressSeekBar);
+            setTimer();
         } else {
             playButton.setBackgroundResource(R.drawable.play);
         }
@@ -49,11 +73,11 @@ public class PlayerActivity extends AppCompatActivity {
                 if (mPlayerSingleton.playerStatus()) {
                     playButton.setBackgroundResource(R.drawable.play);
                     mPlayerSingleton.playerPause();
-                    mPlayerSingleton.timerStop();
+                    stopTimer();
                 } else {
                     playButton.setBackgroundResource(R.drawable.pause);
                     mPlayerSingleton.playerStart();
-                    mPlayerSingleton.timerStart(progressSeekBar);
+                    setTimer();
                 }
             }
         });
@@ -68,7 +92,7 @@ public class PlayerActivity extends AppCompatActivity {
                                "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
                                Toast.LENGTH_SHORT).show();
                 musicTitle.setText(mPlayerSingleton.getCurrentPlaying());
-                mPlayerSingleton.timerStart(progressSeekBar);
+                setTimer();
             }
         });
 
@@ -83,7 +107,7 @@ public class PlayerActivity extends AppCompatActivity {
                                "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
                                Toast.LENGTH_SHORT).show();
                 musicTitle.setText(mPlayerSingleton.getCurrentPlaying());
-                mPlayerSingleton.timerStart(progressSeekBar);
+                setTimer();
             }
         });
 
@@ -94,7 +118,21 @@ public class PlayerActivity extends AppCompatActivity {
     @Override
     protected void onStop () {
         super.onStop();
-        mPlayerSingleton.timerStop();
+        stopTimer();
+    }
+
+    /**
+     * 启动进度条的计时器
+     */
+    private void setTimer() {
+        mTimerHandler.post(mTimerRunnable);
+    }
+
+    /**
+     * 销毁进度条的计时器
+     */
+    private void stopTimer() {
+        mTimerHandler.removeCallbacks(mTimerRunnable);
     }
 
     /**
