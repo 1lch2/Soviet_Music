@@ -8,12 +8,12 @@
 
     <ImageView
         android:id="@+id/album_cover"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="false"
-        android:layout_marginTop="150dp"
-        android:src="@drawable/image" />
+        android:layout_marginTop="140dp"
+        android:src="@drawable/soviet_star" />
 
     <SeekBar
         android:id="@+id/progressbar"
