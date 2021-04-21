@@ -65,6 +65,10 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
      * 类构造方法
      */
     private PlayerSingleton () {
+        // 保证MediaPlayer对象不为空
+        if (mMediaPlayer == null) {
+            mMediaPlayer = new MediaPlayer();
+        }
     }
 
     /**
