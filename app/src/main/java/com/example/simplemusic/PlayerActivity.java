@@ -29,6 +29,9 @@ public class PlayerActivity extends AppCompatActivity {
     /** 循环调整进度条的Runnable */
     private Runnable mTimerRunnable;
 
+    /** 计时器更新间隔时间（毫秒） */
+    private static final int TIMER_INTERVAL = 100;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,18 +47,16 @@ public class PlayerActivity extends AppCompatActivity {
         // 创建HandlerThread在子线程中运行计时器
         HandlerThread handlerThread = new HandlerThread("timerThread");
         handlerThread.start();
+        mTimerHandler = new Handler(handlerThread.getLooper());
 
         // 每100毫秒调整一次进度条
         mTimerRunnable = new Runnable() {
             @Override
             public void run () {
                 progressSeekBar.setProgress(mPlayerSingleton.getPlayerProgress());
-                mTimerHandler.postDelayed(this, 100);
+                mTimerHandler.postDelayed(this, TIMER_INTERVAL);
             }
         };
-
-        mTimerHandler = new Handler(handlerThread.getLooper());
-
 
         // 按播放状态设置控件外观
         if (mPlayerSingleton.playerStatus()) {
@@ -142,13 +143,10 @@ public class PlayerActivity extends AppCompatActivity {
     public class MusicProgressBar implements SeekBar.OnSeekBarChangeListener {
 
         @Override
-        public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
-
-        }
+        public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) { }
 
         @Override
-        public void onStartTrackingTouch (SeekBar seekBar) {
-        }
+        public void onStartTrackingTouch (SeekBar seekBar) { }
 
         @Override
         public void onStopTrackingTouch (SeekBar seekBar) {

@@ -307,6 +307,11 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
         int currentProgress = mMediaPlayer.getCurrentPosition();
         int totalProgress = mMediaPlayer.getDuration();
 
-        return currentProgress * 100 / totalProgress;
+        // 文件时长不可用时，totalProgress为-1
+        if (totalProgress <= 0) {
+            return 0;
+        } else {
+            return currentProgress * 100 / totalProgress;
+        }
     }
 }
