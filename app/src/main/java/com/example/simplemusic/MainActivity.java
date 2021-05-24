@@ -1,25 +1,24 @@
 package com.example.simplemusic;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +34,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     /** 音乐播放器单例对象 */
-    private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
+    private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
 
     /** 音乐播放器服务 */
     private MusicPlayerService mService;
@@ -44,13 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
     /** 为RecyclerView提供数据的Adapter */
     private MusicAdapter mMusicAdapter;
-    /** 工作线程的Handler */
-    private Handler mWorkHandler;
-    /** 主线程的Handler */
-    private Handler mMainHandler;
 
     /** 用于绑定Service的ServiceConnection对象 */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected (ComponentName name, IBinder service) {
             MusicPlayerService.MusicPlayerBinder binder = (MusicPlayerService.MusicPlayerBinder) service;
@@ -79,50 +74,11 @@ public class MainActivity extends AppCompatActivity {
         Button nextButton = findViewById(R.id.button_next);
         Button stopButton = findViewById(R.id.button_stop);
 
-        // 设置音乐列表
+        // 在后台读取本地文件并设置音乐列表
         final RecyclerView recyclerView = findViewById(R.id.music_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-
-        // 创建与主线程关联的Handler
-        mMainHandler = new Handler();
-        HandlerThread handlerThread = new HandlerThread("handlerThread");
-        handlerThread.start();
-
-        // 创建工作线程的Handler
-        mWorkHandler = new Handler(handlerThread.getLooper()) {
-            @Override
-            public void handleMessage (@NonNull Message msg) {
-                super.handleMessage(msg);
-
-                // 只接收一种任务，即为Adapter加载数据并创建RecyclerView
-                if (msg.what == 1) {
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run () {
-                            mMusicAdapter = new MusicAdapter(mMusicList);
-                            recyclerView.setAdapter(mMusicAdapter);
-
-                            // 为列表项设置点击事件，点击后开始播放对应音乐
-                            mMusicAdapter.realItemClick(new MusicAdapter.OnItemClickListener() {
-                                @Override
-                                public void onItemClick (View view, Music music) {
-                                    mService.playerNewStart(music);
-                                    playButton.setBackgroundResource(R.drawable.pause);
-
-                                    Toast.makeText(MainActivity.this,
-                                                   "Now Playing: " + music.getTitle(),
-                                                   Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        };
-
-        // 加载音乐文件资源
-        loadMusic();
+        new LoadMusicTask(MainActivity.this, recyclerView, playButton).execute();
 
         // 点击歌曲封面小图(打开播放器界面)
         smallAlbumCover.setOnClickListener(new View.OnClickListener() {
@@ -203,39 +159,80 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 在子线程中加载文件
+     * 在子线程中加载音乐文件列表
      */
-    private void loadMusic () {
-        new Thread(new Runnable() {
-            @Override
-            public void run () {
-                AssetManager mAssetManager = getAssets();
-                mMusicList = new ArrayList<>();
+    private static class LoadMusicTask extends AsyncTask<Void, Void, Void> {
 
-                int index = 0; // 音乐资源的序号
-                try {
-                    for (String filePath : Objects.requireNonNull(mAssetManager.list(""))) {
-                        if (filePath.endsWith(".mp3")) {
-                            Music tempMusic = new Music();
-                            tempMusic.setPath(filePath);
-                            tempMusic.setTitle(filePath.substring(0, filePath.length() - 4));
-                            tempMusic.setIndex(index++);
+        /** MainActivity 的弱引用 */
+        private final WeakReference<Context> mContextWeakReference;
+        /** RecyclerView 的弱引用 */
+        private final WeakReference<RecyclerView> mRecyclerViewWeakReference;
+        /** Button 的弱引用 */
+        private final WeakReference<Button> mButtonWeakReference;
 
-                            mMusicList.add(tempMusic);
-                        }
+        /**
+         * 构造函数
+         *  @param context 后台任务所需的上下文
+         * @param recyclerView RecyclerView
+         * @param playButton playButton
+         */
+        public LoadMusicTask (Context context, RecyclerView recyclerView, Button playButton) {
+            // 在静态内部类中使用Activity的弱引用来避免内存泄露
+            this.mContextWeakReference = new WeakReference<>(context);
+            this.mRecyclerViewWeakReference = new WeakReference<>(recyclerView);
+            this.mButtonWeakReference = new WeakReference<>(playButton);
+        }
+
+        @Override
+        protected Void doInBackground (Void... voids) {
+            MainActivity mainActivity = (MainActivity)mContextWeakReference.get();
+
+            AssetManager mAssetManager = mainActivity.getAssets();
+            mainActivity.mMusicList = new ArrayList<>();
+
+            int index = 0; // 音乐资源的序号
+            try {
+                for (String filePath : Objects.requireNonNull(mAssetManager.list(""))) {
+                    if (filePath.endsWith(".mp3")) {
+                        Music tempMusic = new Music();
+                        tempMusic.setPath(filePath);
+                        tempMusic.setTitle(filePath.substring(0, filePath.length() - 4));
+                        tempMusic.setIndex(index++);
+
+                        mainActivity.mMusicList.add(tempMusic);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                mPlayerSingleton.setMusicList(mMusicList);
-
-                // 加载完成后发送消息，在主线程中加载音乐列表
-                if (mMusicList != null) {
-                    Message msg = Message.obtain();
-                    msg.what = 1;
-                    mWorkHandler.sendMessage(msg);
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).start();
+            mainActivity.mPlayerSingleton.setMusicList(mainActivity.mMusicList);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute (Void unused) {
+            super.onPostExecute(unused);
+            final MainActivity mainActivity = (MainActivity)mContextWeakReference.get();
+            final Button playButton = mButtonWeakReference.get();
+            RecyclerView recyclerView = mRecyclerViewWeakReference.get();
+
+            mainActivity.mMusicAdapter = new MusicAdapter(mainActivity.mMusicList);
+            recyclerView.setAdapter(mainActivity.mMusicAdapter);
+
+            // 为列表项设置点击事件，点击后开始播放对应音乐
+            mainActivity.mMusicAdapter.realItemClick(new MusicAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick (View view, Music music) {
+                    mainActivity.mService.playerNewStart(music);
+                    playButton.setBackgroundResource(R.drawable.pause);
+
+                    Toast.makeText(mainActivity,
+                                   "Now Playing: " + music.getTitle(),
+                                   Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }
     }
 }

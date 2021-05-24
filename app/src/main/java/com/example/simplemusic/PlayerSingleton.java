@@ -109,7 +109,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
         try {
             mDescriptor = context.getAssets().openFd("le_internationale.mp3"); // 默认歌曲为国际歌
 
-            mMediaPlayer.reset();
+            mMediaPlayer.reset(); // TODO: possible java.lang.IllegalStateException
             mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor
                     .getLength());
             mMediaPlayer.setOnPreparedListener(this);
