@@ -1,7 +1,6 @@
 package com.example.simplemusic;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -17,18 +16,16 @@ import android.os.IBinder;
 public class MusicPlayerService extends Service {
 
     /** 维护的音乐播放器单例 */
-    private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
-    /** 应用的上下文 */
-    private Context mContext = null;
+    private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance(this);
     /** 绑定服务的Binder */
-    private MusicPlayerBinder binder = new MusicPlayerBinder(this);
+    private final MusicPlayerBinder binder = new MusicPlayerBinder(this);
 
     /**
      * 用于绑定服务的Binder类
      */
     public static class MusicPlayerBinder extends Binder {
 
-        private Service currentService;
+        private final Service currentService;
 
         public MusicPlayerBinder (Service service) {
             currentService = service;
@@ -46,8 +43,7 @@ public class MusicPlayerService extends Service {
     public void onCreate () {
         super.onCreate();
 
-        mContext = getApplicationContext();
-        mPlayerSingleton.onCreate(mContext, this);
+        mPlayerSingleton.onCreate(this);
     }
 
     @Override
@@ -108,7 +104,7 @@ public class MusicPlayerService extends Service {
      * @param music 准备播放的新歌曲对象
      */
     public void playerNewStart (Music music) {
-        mPlayerSingleton.playerNewStart(music, mContext);
+        mPlayerSingleton.playerNewStart(music);
     }
 
     /**

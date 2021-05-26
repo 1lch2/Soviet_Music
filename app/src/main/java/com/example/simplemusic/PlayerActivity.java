@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class PlayerActivity extends AppCompatActivity {
 
     /** 播放器单例对象 */
-    private PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
+    private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance(this);
 
     /** 进度条计时器的Handler */
     private Handler mTimerHandler;
@@ -87,7 +87,7 @@ public class PlayerActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                mPlayerSingleton.playerPrevious(PlayerActivity.this);
+                mPlayerSingleton.playerPrevious();
                 playButton.setBackgroundResource(R.drawable.pause);
                 Toast.makeText(PlayerActivity.this,
                                "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
@@ -101,7 +101,7 @@ public class PlayerActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                mPlayerSingleton.playerNext(PlayerActivity.this);
+                mPlayerSingleton.playerNext();
 
                 playButton.setBackgroundResource(R.drawable.pause);
                 Toast.makeText(PlayerActivity.this,

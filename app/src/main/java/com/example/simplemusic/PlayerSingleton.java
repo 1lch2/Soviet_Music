@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -51,6 +52,8 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
     private Notification mNotification = null;
     /** 通知使用的大图标对象 */
     private Bitmap largeIcon = null;
+    /** 上下文的弱引用 */
+    private static WeakReference<Context> mContextWeakReference;
 
     /**
      * 持有单例的静态内部类
@@ -76,7 +79,8 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
      *
      * @return 单例对象
      */
-    public static PlayerSingleton getInstance () {
+    public static PlayerSingleton getInstance (Context context) {
+        mContextWeakReference = new WeakReference<>(context);
         return SingletonHolder.INSTANCE;
     }
 
@@ -102,12 +106,11 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
      * 在Service的onCreate生命周期调用的方法。<br>
      * 用于设置默认歌曲（默认为国际歌）并发送常驻通知。
      *
-     * @param context 启动方法的上下文
      * @param service 要发送通知变为前台服务的Service对象
      */
-    public void onCreate (Context context, Service service) {
+    public void onCreate (Service service) {
         try {
-            mDescriptor = context.getAssets().openFd("le_internationale.mp3"); // 默认歌曲为国际歌
+            mDescriptor = mContextWeakReference.get().getAssets().openFd("le_internationale.mp3"); // 默认歌曲为国际歌
 
             mMediaPlayer.reset(); // TODO: possible java.lang.IllegalStateException
             mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor
@@ -120,7 +123,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
 
         // 仅当运行在Android 8以上时发送常驻通知
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            showNotification(context, service);
+            showNotification(mContextWeakReference.get(), service);
         }
     }
 
@@ -194,10 +197,8 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
 
     /**
      * 切换下一首
-     *
-     * @param context 调用的Activity的上下文
      */
-    public void playerNext (Context context) {
+    public void playerNext () {
         int currentIndex = playerIndex();
         Music temp;
         if (currentIndex == mMusicList.size() - 1) {
@@ -206,15 +207,13 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
             currentIndex++;
             temp = mMusicList.get(currentIndex);
         }
-        playerNewStart(temp, context);
+        playerNewStart(temp);
     }
 
     /**
      * 切换上一首
-     *
-     * @param context 调用的Activity的上下文
      */
-    public void playerPrevious (Context context) {
+    public void playerPrevious () {
         int currentIndex = playerIndex();
         Music temp;
         if (currentIndex == 0) {
@@ -223,7 +222,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
             currentIndex--;
             temp = mMusicList.get(currentIndex);
         }
-        playerNewStart(temp, context);
+        playerNewStart(temp);
     }
 
     /**
@@ -259,9 +258,9 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
      *
      * @param music 准备播放的新歌曲对象
      */
-    public void playerNewStart (Music music, Context context) {
+    public void playerNewStart (Music music) {
         try {
-            mDescriptor = context.getAssets().openFd(music.getPath());
+            mDescriptor = mContextWeakReference.get().getAssets().openFd(music.getPath());
 
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(mDescriptor.getFileDescriptor(), mDescriptor.getStartOffset(), mDescriptor
@@ -278,7 +277,7 @@ public class PlayerSingleton implements MediaPlayer.OnPreparedListener {
         currentIndex = music.getIndex();
 
         // 重新发布常驻通知，更新内容
-        mBuilder = new NotificationCompat.Builder(context, "music");
+        mBuilder = new NotificationCompat.Builder(mContextWeakReference.get(), "music");
         mBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setLargeIcon(largeIcon)
                 .setContentTitle("Soviet Music player")

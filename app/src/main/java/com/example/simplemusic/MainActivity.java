@@ -34,7 +34,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     /** 音乐播放器单例对象 */
-    private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance();
+    private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance(this);
 
     /** 音乐播放器服务 */
     private MusicPlayerService mService;
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                mPlayerSingleton.playerPrevious(MainActivity.this);
+                mPlayerSingleton.playerPrevious();
                 playButton.setBackgroundResource(R.drawable.pause);
                 Toast.makeText(MainActivity.this,
                                "Now Playing: " + mPlayerSingleton.getCurrentPlaying(),
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View v) {
-                mPlayerSingleton.playerNext(MainActivity.this);
+                mPlayerSingleton.playerNext();
 
                 playButton.setBackgroundResource(R.drawable.pause);
                 Toast.makeText(MainActivity.this,
