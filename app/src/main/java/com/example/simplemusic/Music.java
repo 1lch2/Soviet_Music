@@ -4,7 +4,7 @@ package com.example.simplemusic;
  * 音乐对象类。<br>
  * 一个Java Bean，字段包含音乐标题，文件路径和封面图
  *
- * @author lichenghao02
+ * @author 1lch2
  * @since 2021/04/13
  */
 public class Music {

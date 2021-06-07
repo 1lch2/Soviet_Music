@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
  * 音乐播放器界面。<br>
  * 由主界面点击小封面图进入，点击系统返回按钮可以返回到主界面。
  *
- * @author lichenghao02
+ * @author 1lch2
  * @date 2021/4/12
  */
 public class PlayerActivity extends AppCompatActivity {

@@ -24,7 +24,7 @@ import java.util.List;
  * 类对外暴露多个公共方法，通过这些方法可以控制音乐启动停止，切换音乐，同时维护常驻的通知内容。
  * 同时维护一个为进度条计时的Timer，仅当进入PlayerActivity时启动计时任务并移动进度条。
  *
- * @author lichenghao02
+ * @author 1lch2
  * @since 2021/04/15
  */
 public class PlayerSingleton implements MediaPlayer.OnPreparedListener {

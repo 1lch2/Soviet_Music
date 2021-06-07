@@ -10,7 +10,7 @@ import android.os.IBinder;
  * 服务持有并维护音乐播放器单例对象，通过与Activity绑定并在通知栏常驻保持运行。
  * 服务在主界面销毁后解除绑定并停止。
  *
- * @author lichenghao02
+ * @author 1lch2
  * @since 2021/04/14
  */
 public class MusicPlayerService extends Service {

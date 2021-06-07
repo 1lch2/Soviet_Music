@@ -15,7 +15,7 @@ import java.util.List;
  * 填充音乐列表的Adapter类<br>
  * 为存放音乐列表的RecyclerView提供数据，每个列表项内容来自Music对象
  *
- * @author lichenghao02
+ * @author 1lch2
  * @since 2021/04/14
  */
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {

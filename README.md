@@ -6,5 +6,5 @@ This is a simple music player that loads music files from project `assets` direc
 Currently, this player can only play the music inside the project directory. The function of scanning music from the device will be added in future updates.
 
 ## SDK version
-- Minimum SDK level: 21 (Android 5.0)
+- Minimum SDK level: 28 (Android 9)
 - Compile SDK level: 30 (Android 10)

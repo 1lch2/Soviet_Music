@@ -1,9 +1,11 @@
 package com.example.simplemusic;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,19 +30,22 @@ import java.util.Objects;
  * <p>App启动后进入此界面，通过点击底部小封面图进入PlayerActivity。
  * 应用启动后会启动并绑定MusicPlayerService，并在到达onDestroy声明周期时解绑并停止该Service。
  *
- * @author lichenghao02
+ * @author 1lch2
  * @since 2021/04/12
  */
 public class MainActivity extends AppCompatActivity {
 
+    /** 权限请求代码 - 读取外部存储 */
+    private static final int PERMISSION_REQUEST_STORAGE = 1000;
+    /** 权限请求代码 - 前台服务 */
+    private static final int PERMISSION_REQUEST_FOREGROUND = 1001;
+
     /** 音乐播放器单例对象 */
     private final PlayerSingleton mPlayerSingleton = PlayerSingleton.getInstance(this);
-
     /** 音乐播放器服务 */
     private MusicPlayerService mService;
     /** 从assets目录读取的音乐列表 */
     private List<Music> mMusicList;
-
     /** 为RecyclerView提供数据的Adapter */
     private MusicAdapter mMusicAdapter;
 
@@ -140,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart () {
         super.onStart();
+        this.requestStoragePermission();
         bindService(new Intent(this, MusicPlayerService.class), mConnection, 0);
     }
 
@@ -156,6 +162,37 @@ public class MainActivity extends AppCompatActivity {
     private void openMainPlayer () {
         Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * 检查是否已经获得读取存储的权限
+     *
+     * @return 若已授权则返回true
+     */
+    private boolean isStoragePermissionGranted() {
+        return checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * 检查是否已经获得前台服务的权限
+     *
+     * @return 若已授权则返回true
+     */
+    private boolean isForegroundPermissionGranted() {
+        return checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * 分别请求未获取的权限
+     */
+    private void requestStoragePermission() {
+        if (!isStoragePermissionGranted()) {
+            requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+        }
+
+        if (!isForegroundPermissionGranted()) {
+            requestPermissions(new String[] {Manifest.permission.FOREGROUND_SERVICE}, PERMISSION_REQUEST_FOREGROUND);
+        }
     }
 
     /**
