@@ -1,68 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/player_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".PlayerActivity">
-
-    <ImageView
-        android:id="@+id/album_cover"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="false"
-        android:layout_marginTop="140dp"
-        android:src="@drawable/soviet_star" />
-
-    <SeekBar
-        android:id="@+id/progressbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/album_cover"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginRight="20dp" />
-
-    <Button
-        android:id="@+id/button_play_player"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_below="@id/progressbar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="25dp"
-        android:layout_marginTop="62dp"
-        android:layout_marginRight="25dp"
-        android:background="@drawable/play" />
-
-    <Button
-        android:id="@+id/button_previous_player"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignBaseline="@id/button_play_player"
-        android:layout_toLeftOf="@id/button_play_player"
-        android:background="@android:drawable/ic_media_previous"
-        android:backgroundTint="#000000" />
-
-    <Button
-        android:id="@+id/button_next_player"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignBaseline="@id/button_play_player"
-        android:layout_toRightOf="@id/button_play_player"
-        android:background="@android:drawable/ic_media_next"
-        android:backgroundTint="#000000" />
 
     <TextView
         android:id="@+id/title_music"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
-        android:gravity="center"
         android:text="@string/title_music"
         android:textColor="#000000"
         android:textSize="24sp" />
 
-</RelativeLayout>
+
+    <ImageView
+        android:id="@+id/album_cover"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/soviet_star"
+        android:contentDescription="@string/cover"
+        tools:ignore="RtlHardcoded" />
+
+    <SeekBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="60dp"
+        tools:ignore="RtlHardcoded" />
+
+    <LinearLayout
+        android:id="@+id/player_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        tools:ignore="RtlHardcoded,RtlSymmetry">
+
+        <Button
+            android:id="@+id/button_previous_player"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@android:drawable/ic_media_previous"
+            android:backgroundTint="#000000" />
+
+        <Button
+            android:id="@+id/button_play_player"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="25dp"
+            android:background="@drawable/play" />
+
+
+        <Button
+            android:id="@+id/button_next_player"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@android:drawable/ic_media_next"
+            android:backgroundTint="#000000" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

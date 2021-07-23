@@ -33,6 +33,7 @@ import java.util.Objects;
  * @author 1lch2
  * @since 2021/04/12
  */
+@SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity {
 
     /** 权限请求代码 - 读取外部存储 */

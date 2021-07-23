@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Soviet Music</string>
     <string name="title_music">No music in play</string>
+    <string name="cover">cover</string>
 </resources>
